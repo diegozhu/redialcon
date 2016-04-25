@@ -51,7 +51,6 @@ class RedisStats:
             print '[redialcon][error]could not find redis-cli , please assign full redis-cli path with -b , e.g. /usr/bin/redis-cli'
             sys.exit(2)
         dic = dict(self._stat_regex.findall(info))
-        print dic
         if(len(dic) == 0):
             print '[redialcon][error]could not get redis info , empty '
             sys.exit(2)
@@ -195,7 +194,6 @@ def main():
 
     # check. Substitute with appropriate HTTP code.
     if connection.code == 200:
-        print 'res:'
         print connection.read()
     else:
         print '{"err":1,"msg":"%s"}' % connection
