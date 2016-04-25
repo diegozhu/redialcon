@@ -42,6 +42,8 @@ class RedisStats:
             self._cmd = "%s -a %s" % (self._cmd, passwd )
     def stats(self):
         ' Return a dict containing redis stats '
+        if(debug)
+            print self._cmd
         info = commands.getoutput(self._cmd)
         return dict(self._stat_regex.findall(info))
 
@@ -129,6 +131,7 @@ def main():
     dataToPush = []   
     tags = 'port=%s' % port
     value = None
+
     conn = RedisStats(port, pswd)
     stats = conn.stats()
     for key,vtype in monit_keys:
@@ -142,7 +145,9 @@ def main():
                 value = float(stats[key])
             except Exception:
                 value = defaultDataWhenFailed
-        
+        if(value == None)
+            value = defaultDataWhenFailed
+
         i = {
             'metric': '%s.%s' % (metric, key),
             'Endpoint': endPoint,
