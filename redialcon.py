@@ -149,7 +149,7 @@ def main():
             value = defaultDataWhenFailed
 
         i = {
-            'metric': '%s.%s' % (metric, key),
+            'Metric': '%s.%s' % (metric, key),
             'Endpoint': endPoint,
             'Timestamp': timestamp,
             'step': step,
