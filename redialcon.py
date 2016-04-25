@@ -47,7 +47,7 @@ class RedisStats:
         if(debug):
             print self._cmd
         info = commands.getoutput(self._cmd)
-        if(info.find('No such file or directory')):
+        if(info.find('No such file or directory') != -1):
             print '[redialcon][error]could not find redis-cli , please assign full redis-cli path with -b , e.g. /usr/bin/redis-cli'
             sys.exit(2)
         dic = dict(self._stat_regex.findall(info))
