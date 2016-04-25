@@ -33,7 +33,7 @@ endPoint = socket.gethostname()
 
 class RedisStats:
     # 如果你是自己编译部署到redis，请将下面的值替换为你到redis-cli路径
-    _redis_cli = '/usr/local/bin/redis-cli'
+    _redis_cli = '/usr/bin/redis-cli'
     _stat_regex = re.compile(ur'(\w+):([0-9]+\.?[0-9]*)\r')
 
     def __init__(self):
