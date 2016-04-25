@@ -20,8 +20,8 @@ import urllib2, base64
 debug = False
 timestamp = int(time.time())
 falconAgentUrl = 'http://127.0.0.1:1988/v1/push'
-Step = 60
-Metric = 'postgresql'
+step = 60
+metric = 'postgresql'
 #send data when error happened
 alwaysSend = True
 defaultDataWhenFailed = -1
@@ -40,11 +40,8 @@ class RedisStats:
         self._cmd = '%s -h %s -p %s info' % (self._redis_cli, host, port)
         if passwd not in ['', None]:
             self._cmd = "%s -a %s" % (self._cmd, passwd )
-        print slef._cmd
     def stats(self):
         ' Return a dict containing redis stats '
-        print 'aa'
-        print slef._cmd
         info = commands.getoutput(self._cmd)
         return dict(self._stat_regex.findall(info))
 
@@ -66,28 +63,28 @@ def usage():
     sys.exit(2)
 
 def main():
-    global debug,timestamp,falconAgentUrl,Step,Metric,alwaysSend,defaultDataWhenFailed,host,port,user,pswd
+    global debug,timestamp,falconAgentUrl,step,metric,alwaysSend,defaultDataWhenFailed,host,port,user,pswd,endPoint
     
     if len(sys.argv[1:]) == 0:
         usage()
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"t:f:a:v:d:h:u:p:e:c:D:H:",['--help'])
+        opts, args = getopt.getopt(sys.argv[1:],"t:f:a:v:h:u:p:e:c:D:H:",['--help'])
     except getopt.GetoptError:
         usage()
 
-    global debug,timestamp,falconAgentUrl,Step,Metric,alwaysSend,defaultDataWhenFailed,host,port,user,pswd
+    global debug,timestamp,falconAgentUrl,step,metric,alwaysSend,defaultDataWhenFailed,host,port,user,pswd
     for opt, arg in opts:
         if opt in ('-H','--help'):
             usage()
         if opt == '-t':
-            Step = arg
+            step = arg
         if opt == '-D':
             debug = arg.lower() == 'true' and True or False
         elif opt == '-f':
             falconAgentUrl = arg
         elif opt == '-m':
-            Metric = arg
+            metric = arg
         elif opt == '-a':
             alwaysSend = arg.lower() == 'true' and True or False
         elif opt == '-e':
@@ -112,7 +109,7 @@ def main():
                 print 'error parse config file :%s' % (arg)
                 sys.exit(2)
 
-    print '%s@%s:%s/%s %s %s' %(user,host,port,db,falconAgentUrl,Metric)
+    print '[redialcon]%s@%s:%s %s %s' %(user,host,port,falconAgentUrl,metric)
     
     monit_keys = [
         ('connected_clients','GAUGE'), 
@@ -129,10 +126,10 @@ def main():
         ('keyspace_hit_ratio','GAUGE'),
     ]
   
-        
+    dataToPush = []   
     tags = 'port=%s' % port
-
-    conn = RedisStats(port, passwd)
+    value = None
+    conn = RedisStats(port, pswd)
     stats = conn.stats()
     for key,vtype in monit_keys:
         if key == 'keyspace_hit_ratio':
@@ -147,21 +144,22 @@ def main():
                 value = defaultDataWhenFailed
         
         i = {
-            'Metric': '%s.%s' % (metric, key),
+            'metric': '%s.%s' % (metric, key),
             'Endpoint': endPoint,
             'Timestamp': timestamp,
-            'Step': Step,
+            'step': step,
             'Value': value,
             'CounterType': vtype,
             'TAGS': tags
         }
-        p.append(i)
+        dataToPush.append(i)
 
-    print json.dumps(p, sort_keys=True,indent=4)
+    if(debug):
+        print json.dumps(dataToPush, sort_keys=True,indent=4)
     method = "POST"
     handler = urllib2.HTTPHandler()
     opener = urllib2.build_opener(handler)
-    request = urllib2.Request(falconAgentUrl, data=json.dumps(p) )
+    request = urllib2.Request(falconAgentUrl, data=json.dumps(dataToPush) )
     request.add_header("Content-Type",'application/json')
     request.get_method = lambda: method
     try:
