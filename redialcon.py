@@ -36,9 +36,9 @@ class RedisStats:
     _redis_cli = '/usr/local/bin/redis-cli'
     _stat_regex = re.compile(ur'(\w+):([0-9]+\.?[0-9]*)\r')
 
-    def __init__(self,  port='6379', passwd=None, host='127.0.0.1',user='redis'):
+    def __init__(self):
         self._cmd = '%s -h %s -p %s info' % (self._redis_cli, host, port)
-        if passwd not in ['', None]:
+        if pswd not in ['', None]:
             self._cmd = "%s -a %s" % (self._cmd, passwd )
     def stats(self):
         ' Return a dict containing redis stats '
@@ -132,7 +132,7 @@ def main():
     tags = 'port=%s' % port
     value = None
 
-    conn = RedisStats(port, pswd)
+    conn = RedisStats()
     stats = conn.stats()
     for key,vtype in monit_keys:
         if key == 'keyspace_hit_ratio':
@@ -145,7 +145,7 @@ def main():
                 value = float(stats[key])
             except Exception:
                 value = defaultDataWhenFailed
-        if(value == None)
+        if(value == None):
             value = defaultDataWhenFailed
 
         i = {
