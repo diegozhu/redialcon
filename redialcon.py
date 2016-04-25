@@ -195,6 +195,7 @@ def main():
 
     # check. Substitute with appropriate HTTP code.
     if connection.code == 200:
+        print 'res:'
         print connection.read()
     else:
         print '{"err":1,"msg":"%s"}' % connection
