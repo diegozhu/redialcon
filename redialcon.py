@@ -152,7 +152,7 @@ def main():
             'Metric': '%s.%s' % (metric, key),
             'Endpoint': endPoint,
             'Timestamp': timestamp,
-            'step': step,
+            'Step': step,
             'Value': value,
             'CounterType': vtype,
             'TAGS': tags
