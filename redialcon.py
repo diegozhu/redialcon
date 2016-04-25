@@ -42,7 +42,7 @@ class RedisStats:
             self._cmd = "%s -a %s" % (self._cmd, passwd )
     def stats(self):
         ' Return a dict containing redis stats '
-        if(debug)
+        if(debug):
             print self._cmd
         info = commands.getoutput(self._cmd)
         return dict(self._stat_regex.findall(info))
