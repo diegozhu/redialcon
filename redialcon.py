@@ -80,7 +80,11 @@ def main():
         if opt in ('-H','--help'):
             usage()
         if opt == '-t':
-            step = arg
+            try:
+                step = int(arg)
+            except Exception:
+                print e
+                sys.exit(2)
         if opt == '-D':
             debug = arg.lower() == 'true' and True or False
         elif opt == '-f':
@@ -92,7 +96,11 @@ def main():
         elif opt == '-e':
             endPoint = arg
         elif opt == '-v':
-            defaultDataWhenFailed = arg
+            try:
+                defaultDataWhenFailed = int(arg)
+            except Exception:
+                print e
+                sys.exit(2)
         elif opt == '-h':
             if arg.find(":") == -1:
                 print 'illegel param -h %s , should be host:port' % (arg)
