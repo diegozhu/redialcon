@@ -30,14 +30,16 @@ port = '6379'
 user = 'redis'
 pswd = ''
 endPoint = socket.gethostname()
+redisCli = '/usr/bin/redis-cli'
+
 
 class RedisStats:
     # 如果你是自己编译部署到redis，请将下面的值替换为你到redis-cli路径
-    _redis_cli = '/usr/bin/redis-cli'
     _stat_regex = re.compile(ur'(\w+):([0-9]+\.?[0-9]*)\r')
 
     def __init__(self):
-        self._cmd = '%s -h %s -p %s info' % (self._redis_cli, host, port)
+        global redisCli,host,port,pswd
+        self._cmd = '%s -h %s -p %s info' % (redisCli, host, port)
         if pswd not in ['', None]:
             self._cmd = "%s -a %s" % (self._cmd, passwd )
     def stats(self):
@@ -45,7 +47,15 @@ class RedisStats:
         if(debug):
             print self._cmd
         info = commands.getoutput(self._cmd)
-        return dict(self._stat_regex.findall(info))
+        if(info.find('No such file or directory')):
+            print 'could not find redis-cli , please assign full redis-cli path with -b , e.g. /usr/bin/redis-cli'
+            sys.exit(2)
+        dic = dict(self._stat_regex.findall(info))
+        print dic
+        if(len(dic) == 0):
+            print 'could not get redis info , empty '
+            sys.exit(2)
+        return dic
 
 def usage():
     print ''
@@ -62,6 +72,7 @@ def usage():
     print '    -p password , default empty'
     print '    -e end point , default hostname'
     print '    -c redis config file'
+    print '    -b redis-cli path , default /usr/bin/redis-cli'
     sys.exit(2)
 
 def main():
@@ -71,11 +82,11 @@ def main():
         usage()
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"t:f:a:v:h:u:p:e:c:D:H:",['--help'])
+        opts, args = getopt.getopt(sys.argv[1:],"t:f:a:v:h:u:p:e:c:D:H:b:",['--help'])
     except getopt.GetoptError:
         usage()
 
-    global debug,timestamp,falconAgentUrl,step,metric,alwaysSend,defaultDataWhenFailed,host,port,user,pswd
+    global debug,timestamp,falconAgentUrl,step,metric,alwaysSend,defaultDataWhenFailed,host,port,user,pswd,redisCli
     for opt, arg in opts:
         if opt in ('-H','--help'):
             usage()
@@ -95,6 +106,8 @@ def main():
             alwaysSend = arg.lower() == 'true' and True or False
         elif opt == '-e':
             endPoint = arg
+        elif opt == '-b':
+            redisCli = arg
         elif opt == '-v':
             try:
                 defaultDataWhenFailed = int(arg)
