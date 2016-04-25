@@ -21,7 +21,7 @@ debug = False
 timestamp = int(time.time())
 falconAgentUrl = 'http://127.0.0.1:1988/v1/push'
 step = 60
-metric = 'postgresql'
+metric = 'redis'
 #send data when error happened
 alwaysSend = True
 defaultDataWhenFailed = -1
