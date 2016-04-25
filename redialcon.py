@@ -31,7 +31,7 @@ user = 'redis'
 pswd = ''
 endPoint = socket.gethostname()
 redisCli = '/usr/bin/redis-cli'
-
+print '\n'
 
 class RedisStats:
     # 如果你是自己编译部署到redis，请将下面的值替换为你到redis-cli路径
@@ -48,12 +48,12 @@ class RedisStats:
             print self._cmd
         info = commands.getoutput(self._cmd)
         if(info.find('No such file or directory')):
-            print 'could not find redis-cli , please assign full redis-cli path with -b , e.g. /usr/bin/redis-cli'
+            print '[redialcon][error]could not find redis-cli , please assign full redis-cli path with -b , e.g. /usr/bin/redis-cli'
             sys.exit(2)
         dic = dict(self._stat_regex.findall(info))
         print dic
         if(len(dic) == 0):
-            print 'could not get redis info , empty '
+            print '[redialcon][error]could not get redis info , empty '
             sys.exit(2)
         return dic
 
@@ -116,7 +116,7 @@ def main():
                 sys.exit(2)
         elif opt == '-h':
             if arg.find(":") == -1:
-                print 'illegel param -h %s , should be host:port' % (arg)
+                print '[redialcon][error]illegel param -h %s , should be host:port' % (arg)
                 sys.exit(2)
             host = arg.split(':')[0]
             port = arg.split(':')[1]
@@ -129,7 +129,7 @@ def main():
                 port = commands.getoutput("sed -n 's/^port *\([0-9]\{4,5\}\)/\\1/p' %s" % arg)
                 pswd = commands.getoutput("sed -n 's/^requirepass *\([^ ]*\)/\\1/p' %s" % arg)
             except Exception:
-                print 'error parse config file :%s' % (arg)
+                print '[redialcon][error]error parse config file :%s' % (arg)
                 sys.exit(2)
 
     print '[redialcon]%s@%s:%s %s %s' %(user,host,port,falconAgentUrl,metric)
