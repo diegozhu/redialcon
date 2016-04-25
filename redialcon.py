@@ -1,8 +1,13 @@
 #!/bin/env python
 #-*- coding:utf-8 -*-
 
-__author__ = 'iambocai'
+__author__ = 'diego.zhu'
+__email__ = 'zhuhaiyang55@gmail.com'
 
+import getopt
+import psycopg2
+import psycopg2.extras
+import traceback
 import json
 import time
 import socket
